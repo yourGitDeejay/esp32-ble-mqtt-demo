@@ -5,7 +5,7 @@
 
 #define TAG "MqttManager"
 
-MqttManager::MqttManager(const char *uri, const char *username, const char* password) {
+MqttManager::MqttManager(const char *uri, const char *username, const char* password): IsConnected(false) {
     cfg.uri = uri;
     cfg.username = username;
     cfg.password = password;
@@ -31,33 +31,27 @@ void MqttManager::LogIfNonZero(const char *message, int error_code)
  */
 void MqttManager::MqttEventHandler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
 {
+    MqttManager *mm = (MqttManager*) handler_args;
+
     LOGI(TAG, "Event dispatched from event loop base=%s, event_id=%" PRIi32 "", base, event_id);
     esp_mqtt_event_handle_t event = (esp_mqtt_event_handle_t)event_data;
     esp_mqtt_client_handle_t client = event->client;
     int msg_id;
+
     switch ((esp_mqtt_event_id_t)event_id) {
     case MQTT_EVENT_CONNECTED:
+        mm->IsConnected = true;
         LOGI(TAG, "MQTT_EVENT_CONNECTED");
-        msg_id = esp_mqtt_client_publish(client, "/topic/qos1", "data_3", 0, 1, 0);
-        LOGI(TAG, "sent publish successful, msg_id=%d", msg_id);
-
-        msg_id = esp_mqtt_client_subscribe(client, "/topic/qos0", 0);
-        LOGI(TAG, "sent subscribe successful, msg_id=%d", msg_id);
-
-        msg_id = esp_mqtt_client_subscribe(client, "/topic/qos1", 1);
-        LOGI(TAG, "sent subscribe successful, msg_id=%d", msg_id);
-
-        msg_id = esp_mqtt_client_unsubscribe(client, "/topic/qos1");
-        LOGI(TAG, "sent unsubscribe successful, msg_id=%d", msg_id);
         break;
     case MQTT_EVENT_DISCONNECTED:
+        mm->IsConnected = false;
         LOGI(TAG, "MQTT_EVENT_DISCONNECTED");
         break;
 
     case MQTT_EVENT_SUBSCRIBED:
         LOGI(TAG, "MQTT_EVENT_SUBSCRIBED, msg_id=%d", event->msg_id);
-        msg_id = esp_mqtt_client_publish(client, "/topic/qos0", "data", 0, 0, 0);
-        LOGI(TAG, "sent publish successful, msg_id=%d", msg_id);
+        // msg_id = esp_mqtt_client_publish(client, "/topic/qos0", "data", 0, 0, 0);
+        // LOGI(TAG, "sent publish successful, msg_id=%d", msg_id);
         break;
     case MQTT_EVENT_UNSUBSCRIBED:
         LOGI(TAG, "MQTT_EVENT_UNSUBSCRIBED, msg_id=%d", event->msg_id);
@@ -86,11 +80,38 @@ void MqttManager::MqttEventHandler(void *handler_args, esp_event_base_t base, in
     }
 }
 
-esp_err_t MqttManager::Connect() const {
-    esp_mqtt_client_handle_t client = esp_mqtt_client_init(&(this->cfg));
+esp_err_t MqttManager::Connect() {
+    this->client = esp_mqtt_client_init(&(this->cfg));
     
     /* The last argument may be used to pass data to the event handler, in this example mqtt_event_handler */
-    esp_err_t e = esp_mqtt_client_register_event(client, (esp_mqtt_event_id_t)ESP_EVENT_ANY_ID, &MqttManager::MqttEventHandler, NULL);
+    esp_err_t e = esp_mqtt_client_register_event(this->client, (esp_mqtt_event_id_t)ESP_EVENT_ANY_ID, &MqttManager::MqttEventHandler, this);
     if (e != ESP_OK) return e;
-    return esp_mqtt_client_start(client);
+    return esp_mqtt_client_start(this->client);
+}
+
+void MqttManager::Publish(const char *topic, const char *data, const int &qos, const int &retain) const {
+    if (!IsConnected) {
+        LOGE(TAG, "Connect to broker before publishing! Publish aborted.");
+        return;
+    }
+    int msg_id = esp_mqtt_client_publish(client, topic, data, 0, qos, retain);
+    LOGI(TAG, "sent publish successful, msg_id=%d", msg_id);
+}
+
+void MqttManager::Subscribe(const char *topic, const int &qos) const {
+    if (!IsConnected) {
+        LOGE(TAG, "Connect to broker before subscribing! Subscribe aborted.");
+        return;
+    }
+    int msg_id = esp_mqtt_client_subscribe(client, "/topic/qos0", 0);
+    LOGI(TAG, "sent subscribe successful, msg_id=%d", msg_id);
+}
+
+void MqttManager::UnSubscribe(const char *topic) const {
+    if (!IsConnected) {
+        LOGE(TAG, "Connect to broker before unsubscribing! Unsubscribe aborted.");
+        return;
+    }
+    int msg_id = esp_mqtt_client_unsubscribe(client, "/topic/qos1");
+    LOGI(TAG, "sent unsubscribe successful, msg_id=%d", msg_id);
 }

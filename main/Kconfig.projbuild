@@ -8,13 +8,13 @@ menu "Main Configuration"
 
     config MQTT_SERVER_USERNAME
         string "Client credentials - username"
-        default ""
+        default "user4"
         help
             Print debug messages to console.
 
     config MQTT_SERVER_PASSWORD
         string "Client credentials - password"
-        default ""
+        default "7699779"
         help
             Print debug messages to console.
 
