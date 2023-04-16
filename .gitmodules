@@ -1,0 +1,4 @@
+[submodule "components/nimBLE"]
+	path = components/nimBLE
+	url = https://github.com/h2zero/esp-nimble-cpp.git
+	branch = release/1.3

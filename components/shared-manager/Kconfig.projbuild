@@ -1,0 +1,9 @@
+menu "Shared Manager Configuration"
+
+    config SHOW_DEBUG_MESSAGES
+        bool "Print debug messages"
+        default y
+        help
+            Print debug messages to console.
+
+endmenu
