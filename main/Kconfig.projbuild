@@ -1,0 +1,21 @@
+menu "Main Configuration"
+
+    config MQTT_SERVER_URI
+        string "Broker URL"
+        default "mqtt://mqtt.eclipseprojects.io"
+        help
+            Print debug messages to console.
+
+    config MQTT_SERVER_USERNAME
+        string "Client credentials - username"
+        default ""
+        help
+            Print debug messages to console.
+
+    config MQTT_SERVER_PASSWORD
+        string "Client credentials - password"
+        default ""
+        help
+            Print debug messages to console.
+
+endmenu

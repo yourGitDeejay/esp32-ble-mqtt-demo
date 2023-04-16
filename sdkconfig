@@ -133,6 +133,14 @@ CONFIG_PARTITION_TABLE_MD5=y
 # end of Partition Table
 
 #
+# Main Configuration
+#
+CONFIG_MQTT_SERVER_URI="mqtt://mqtt.eclipseprojects.io"
+CONFIG_MQTT_SERVER_USERNAME="user4"
+CONFIG_MQTT_SERVER_PASSWORD="7699779"
+# end of Main Configuration
+
+#
 # Shared Manager Configuration
 #
 CONFIG_SHOW_DEBUG_MESSAGES=y
