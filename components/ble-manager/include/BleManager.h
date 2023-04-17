@@ -20,8 +20,8 @@ private:
     bool isAdvertising;
 
     BLEServer *server;
-    BLEService *notifyService;
     BLEService *writeService;
+    BLEService *notifyService;
     BLECharacteristic *requestCharacteristic;
 
     std::vector<Value> notifyCharacteristics;
@@ -31,7 +31,8 @@ public:
     BleManager(
         const std::string &deviceName, 
         std::function<void(const ActivityStatus &status)> statusChanged, 
-        std::function<void(const BluetoothStatus &status)> btStatusChangedCallback
+        std::function<void(const BluetoothStatus &status)> btStatusChangedCallback,
+        std::function<void(const char *data)> mCallbackString
     );
     ~BleManager();
 

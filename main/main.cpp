@@ -25,9 +25,15 @@ extern "C"
 MqttManager mqtt;
 
 void demoCharWrite(const ActivityStatus& status) {
-    LOGI(TAG, "Characteristic status changed, new status: %i", (int)status);
+    LOGI(TAG, "\n\nCharacteristic status changed, new status: %i\n\n", (int)status);
 
     mqtt.Publish(CONFIG_MQTT_TEST_TOPIC, "Characteristic changed!", 1, 0);
+}
+
+void demoCharWriteString(const char* data) {
+    LOGI(TAG, "\n\nCharacteristic written, new data: %s\n\n", data);
+
+    mqtt.Publish(CONFIG_MQTT_TEST_TOPIC, data, 1, 0);
 }
 
 void btStatusChanged(const BluetoothStatus &status) {
@@ -45,7 +51,7 @@ void app_main(void)
     EventGroupHandle_t wifiEventGroup = xEventGroupCreate();
 
     bool wifiConnected = false;
-    BleManager ble(BLUETOOTH_NAME, &demoCharWrite, &btStatusChanged);
+    BleManager ble(BLUETOOTH_NAME, &demoCharWrite, &btStatusChanged, &demoCharWriteString);
     WifiManager wifi(wifiEventGroup);
 
     wifi.Connect(CONFIG_WIFI_SSID, CONFIG_WIFI_PASSWORD, WIFI_AUTH_WPA2_PSK);
@@ -77,7 +83,7 @@ void app_main(void)
                 LOGI(TAG, "Advertising...");
                 ble.Advertise();
 
-                mqtt.Publish(CONFIG_MQTT_TEST_TOPIC, "Hello world", 1, 0);
+                // mqtt.Publish(CONFIG_MQTT_TEST_TOPIC, "Hello world", 1, 0);
                 vTaskDelay(10000 / portTICK_PERIOD_MS);
             }
         }

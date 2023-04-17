@@ -6,7 +6,8 @@
 BleManager::BleManager(
     const std::string &deviceName, 
     std::function<void(const ActivityStatus &status)> statusChangedCallback, 
-    std::function<void(const BluetoothStatus &status)> btStatusChangedCallback
+    std::function<void(const BluetoothStatus &status)> btStatusChangedCallback,
+    std::function<void(const char *data)> mCallbackString
 ) : isAdvertising(false), 
     callbacks(btStatusChangedCallback)
 {
@@ -23,7 +24,7 @@ BleManager::BleManager(
         REQUEST_UUID,
         NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::WRITE
     );
-    this->requestCharacteristic->setCallbacks(new BleWriteServiceCallbacks(statusChangedCallback));
+    this->requestCharacteristic->setCallbacks(new BleWriteServiceCallbacks(statusChangedCallback, mCallbackString));
 
     this->server->setCallbacks(&(this->callbacks), false);
 
