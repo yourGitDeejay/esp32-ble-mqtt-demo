@@ -39,9 +39,7 @@ void WifiManager::Connect(const std::string &ssid, const std::string &password, 
     wifi_config_t wifi_config = { 0 };
     strlcpy((char*)wifi_config.sta.ssid, ssid.c_str(), sizeof(wifi_config.sta.ssid));
     strlcpy((char*)wifi_config.sta.password, password.c_str(), sizeof(wifi_config.sta.password));
-    // strcpy((char *)wifi_config.sta.ssid, ssid.c_str());
-    // strcpy((char *)wifi_config.sta.password, password.c_str());
-    // wifi_config.sta.threshold.authmode = mode;
+    wifi_config.sta.threshold.authmode = mode;
 
     LOGI(TAG, "Connecting to %s, pass = %s, mode = %i", wifi_config.sta.ssid, wifi_config.sta.password, mode);
 

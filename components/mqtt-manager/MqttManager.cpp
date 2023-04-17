@@ -106,7 +106,7 @@ void MqttManager::Subscribe(const char *topic, const int &qos) const {
         LOGE(TAG, "Connect to broker before subscribing! Subscribe aborted.");
         return;
     }
-    int msg_id = esp_mqtt_client_subscribe(client, "/topic/qos0", 0);
+    int msg_id = esp_mqtt_client_subscribe(client, topic, 0);
     LOGI(TAG, "sent subscribe successful, msg_id=%d", msg_id);
 }
 
@@ -115,6 +115,6 @@ void MqttManager::UnSubscribe(const char *topic) const {
         LOGE(TAG, "Connect to broker before unsubscribing! Unsubscribe aborted.");
         return;
     }
-    int msg_id = esp_mqtt_client_unsubscribe(client, "/topic/qos1");
+    int msg_id = esp_mqtt_client_unsubscribe(client, topic);
     LOGI(TAG, "sent unsubscribe successful, msg_id=%d", msg_id);
 }

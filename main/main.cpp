@@ -60,20 +60,6 @@ void app_main(void)
         LOGI(TAG, "connected to ap SSID:%s password:%s", CONFIG_WIFI_SSID, CONFIG_WIFI_PASSWORD);
     } else if (bits & WIFI_FAIL_BIT) {
         LOGI(TAG, "Failed to connect to SSID:%s, password:%s", CONFIG_WIFI_SSID, CONFIG_WIFI_PASSWORD);
-
-        for (int i = 0; i < WIFI_AUTH_MAX; i++) {
-            LOGI(TAG, "Trying to connect with mode = %i", i);
-            wifi.Reset();
-            xEventGroupClearBits(wifiEventGroup, WIFI_CONNECTED_BIT | WIFI_FAIL_BIT);
-            wifi.Connect(CONFIG_WIFI_SSID, CONFIG_WIFI_PASSWORD, (wifi_auth_mode_t)i);
-
-            bits = xEventGroupWaitBits(wifiEventGroup, WIFI_CONNECTED_BIT | WIFI_FAIL_BIT, pdFALSE, pdFALSE, portMAX_DELAY);
-            if (bits & WIFI_CONNECTED_BIT) {
-                wifiConnected = true;
-                LOGI(TAG, "Successfully connected with mode %i", i);
-                break;
-            }
-        }
     } else {
         LOGE(TAG, "UNEXPECTED EVENT");
     }
@@ -86,6 +72,7 @@ void app_main(void)
             LOGI(TAG, "Wait for some time...");
             vTaskDelay(4000 / portTICK_PERIOD_MS);
 
+            mqtt.Subscribe(CONFIG_MQTT_TEST_TOPIC, 1);
             while (1) {
                 LOGI(TAG, "Advertising...");
                 ble.Advertise();
