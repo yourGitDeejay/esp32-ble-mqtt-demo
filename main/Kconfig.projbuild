@@ -1,20 +1,38 @@
 menu "Main Configuration"
 
+    config WIFI_SSID
+        string "SSID of WiFi"
+        default ""
+        help
+            Print debug messages to console.
+
+    config WIFI_PASSWORD
+        string "Password of WiFi"
+        default ""
+        help
+            Print debug messages to console.
+
     config MQTT_SERVER_URI
         string "Broker URL"
-        default "mqtt://mqtt.eclipseprojects.io"
+        default ""
         help
             Print debug messages to console.
 
     config MQTT_SERVER_USERNAME
         string "Client credentials - username"
-        default "user4"
+        default ""
         help
             Print debug messages to console.
 
     config MQTT_SERVER_PASSWORD
         string "Client credentials - password"
-        default "7699779"
+        default ""
+        help
+            Print debug messages to console.
+
+    config MQTT_TEST_TOPIC
+        string "Topic for testing"
+        default ""
         help
             Print debug messages to console.
 
