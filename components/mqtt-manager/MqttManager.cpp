@@ -5,11 +5,7 @@
 
 #define TAG "MqttManager"
 
-MqttManager::MqttManager(const char *uri, const char *username, const char* password): IsConnected(false) {
-    cfg.uri = uri;
-    cfg.username = username;
-    cfg.password = password;
-}
+MqttManager::MqttManager(): IsConnected(false) { }
 
 
 void MqttManager::LogIfNonZero(const char *message, int error_code)
@@ -80,11 +76,18 @@ void MqttManager::MqttEventHandler(void *handler_args, esp_event_base_t base, in
     }
 }
 
-esp_err_t MqttManager::Connect() {
-    this->client = esp_mqtt_client_init(&(this->cfg));
+esp_err_t MqttManager::Connect(const char *uri, const char *username, const char* password) {
+    LOGI(TAG, "Generating MQTT config");
+    esp_mqtt_client_config_t cfg = { 0 };
+    cfg.uri = uri;
+    cfg.username = username;
+    cfg.password = password;
+    this->client = esp_mqtt_client_init(&cfg);
+    LOGI(TAG, "MQTT init success");
     
     /* The last argument may be used to pass data to the event handler, in this example mqtt_event_handler */
     esp_err_t e = esp_mqtt_client_register_event(this->client, (esp_mqtt_event_id_t)ESP_EVENT_ANY_ID, &MqttManager::MqttEventHandler, this);
+    LOGI(TAG, "MQTT register event");
     if (e != ESP_OK) return e;
     return esp_mqtt_client_start(this->client);
 }

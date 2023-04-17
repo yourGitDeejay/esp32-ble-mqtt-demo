@@ -16,9 +16,9 @@ protected:
 public:
     bool IsConnected;
 
-    MqttManager(const char *uri, const char *username, const char* password);
+    MqttManager();
 
-    esp_err_t Connect();
+    esp_err_t Connect(const char *uri, const char *username, const char* password);
 
     void Publish(const char *topic, const char *data, const int &qos, const int &retain) const;
     void Subscribe(const char *topic, const int &qos) const;
