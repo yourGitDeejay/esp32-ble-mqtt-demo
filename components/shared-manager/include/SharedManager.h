@@ -1,6 +1,10 @@
 #ifndef SHARED_MANAGER_H
 #define SHARED_MANAGER_H
 
+/**
+ * This file could (should) be replaced with Kconfig.projbuild
+*/
+
 #include <stdint.h>
 #include <string>
 

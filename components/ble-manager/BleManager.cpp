@@ -17,15 +17,19 @@ BleManager::BleManager(
     // Create the BLE Server
     this->server = NimBLEDevice::createServer();
 
+    // add demo BLE services
     this->notifyService = this->server->createService(NOTIFY_SERVICE_UUID);
     this->writeService = this->server->createService(WRITE_SERVICE_UUID);
 
+    // add demo characteristics, which can be overwritten
     this->requestCharacteristic = this->writeService->createCharacteristic(
         REQUEST_UUID,
         NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::WRITE
     );
+    // add callbacks (for example on write)
     this->requestCharacteristic->setCallbacks(new BleWriteServiceCallbacks(statusChangedCallback, mCallbackString));
 
+    // server callbacks (for example on connect/disconnect)
     this->server->setCallbacks(&(this->callbacks), false);
 
     LOGI(TAG, "Init");
@@ -73,6 +77,7 @@ void BleManager::StopAdvertise() {
     }
 }
 
+// used to notify clients about changes of characteristics
 void BleManager::NotifyAll() {
     if (!this->callbacks.IsConnected()) {
         LOGW(TAG, "No device is connected, could not notify the client.");
@@ -87,6 +92,7 @@ void BleManager::NotifyAll() {
     }
 }
 
+// notify only specific characteristic
 void BleManager::Notify(const std::string& uuid) {
     if (!this->callbacks.IsConnected()) {
         LOGW(TAG, "No device is connected, could not notify the client.");
@@ -110,6 +116,7 @@ void BleManager::AddNotifyCharacteristic(const std::vector<NotifyValue> &nValues
     }
 }
 
+// adds characteristics that enable notifications and reading from clients
 void BleManager::AddNotifyCharacteristic(const NotifyValue &nValue) {
     NimBLECharacteristic* c;
     Value v;

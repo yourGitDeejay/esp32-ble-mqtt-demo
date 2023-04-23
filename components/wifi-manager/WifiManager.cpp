@@ -35,7 +35,8 @@ void WifiManager::Connect(const std::string &ssid, const std::string &password, 
                                                         &WifiManager::WifiEventHandler,
                                                         this,
                                                         &instance_got_ip));
-
+    
+    // struct needs to be initialized, or else connection won't work
     wifi_config_t wifi_config = { 0 };
     strlcpy((char*)wifi_config.sta.ssid, ssid.c_str(), sizeof(wifi_config.sta.ssid));
     strlcpy((char*)wifi_config.sta.password, password.c_str(), sizeof(wifi_config.sta.password));
@@ -43,6 +44,7 @@ void WifiManager::Connect(const std::string &ssid, const std::string &password, 
 
     LOGI(TAG, "Connecting to %s, pass = %s, mode = %i", wifi_config.sta.ssid, wifi_config.sta.password, mode);
 
+    // wifi station mode - connect to hotspot
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA) );
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config) );
     ESP_ERROR_CHECK(esp_wifi_start());
@@ -66,6 +68,7 @@ void WifiManager::WifiEventHandler(void* arg, esp_event_base_t event_base, int32
     } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
         wifi_event_sta_disconnected_t* data = (wifi_event_sta_disconnected_t*) event_data;
         
+        // retry for a few times
         if (wm->numRetry < MAX_RETRY) {
             ESP_ERROR_CHECK(esp_wifi_connect());
             wm->numRetry++;
@@ -74,7 +77,9 @@ void WifiManager::WifiEventHandler(void* arg, esp_event_base_t event_base, int32
             xEventGroupSetBits(wm->wifiEventGroup, WIFI_FAIL_BIT);
         }
         LOGI(TAG,"connect to the AP fail, reason = %i", data->reason);
-    } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
+    } 
+    // connected, got IP
+    else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
         ip_event_got_ip_t* event = (ip_event_got_ip_t*) event_data;
         LOGI(TAG, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
         wm->numRetry = 0;

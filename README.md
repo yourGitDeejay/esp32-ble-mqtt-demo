@@ -10,6 +10,12 @@
 - Run `idf.py menuconfig` and check Bluetooth (BLE - NimBLE only) is selected (Component config -> Bluetooth (check) -> Bluetooth host -> NimBLE).
 
 - Update secrets in `./main/Kconfig.projbuild`. 
+  - to update the changes, run (if file `sdkconfig` exists) 
+  ```bash
+  $ mv sdkconfig sdkconfig.old
+  $ idf.py fullclean
+  $ idf.py build
+  ``` 
 
 ## Used libraries
 
